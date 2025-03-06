@@ -1,0 +1,83 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run --machine --start-paused -d 00008120-0002685A0212201E --devtools-server-address http://127.0.0.1:9100/ --target /Users/weagile/Nilesh Mali/mobile-frontend/lib/main.dart
+
+## exception
+
+SocketException: SocketException: Send failed (OS Error: No route to host, errno = 65), address = 0.0.0.0, port = 5353
+
+```
+#0      _NativeSocket.send (dart:io-patch/socket_patch.dart:1275:34)
+#1      _RawDatagramSocket.send (dart:io-patch/socket_patch.dart:2590:15)
+#2      MDnsClient.lookup (package:multicast_dns/multicast_dns.dart:219:22)
+#3      MDnsVmServiceDiscovery._pollingVmService (package:flutter_tools/src/mdns_discovery.dart:232:66)
+<asynchronous suspension>
+#4      MDnsVmServiceDiscovery.firstMatchingVmService (package:flutter_tools/src/mdns_discovery.dart:188:56)
+<asynchronous suspension>
+#5      MDnsVmServiceDiscovery.getVMServiceUriForLaunch (package:flutter_tools/src/mdns_discovery.dart:433:50)
+<asynchronous suspension>
+#6      Future.wait.<anonymous closure> (dart:async/future.dart:534:21)
+<asynchronous suspension>
+#7      Future.any.onValue (dart:async/future.dart:628:5)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, 3.24.4, on macOS 15.0.1 24A348 darwin-arm64, locale en-IN)
+    • Flutter version 3.24.4 on channel stable at /Users/weagile/development/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision 603104015d (4 weeks ago), 2024-10-24 08:01:25 -0700
+    • Engine revision db49896cf2
+    • Dart version 3.5.4
+    • DevTools version 2.37.3
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+    • Android SDK at /Users/weagile/Library/Android/sdk
+    • Platform android-34, build-tools 34.0.0
+    • Java binary at: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java
+    • Java version OpenJDK Runtime Environment (build 21.0.3+-79915917-b509.11)
+    • All Android licenses accepted.
+
+[✓] Xcode - develop for iOS and macOS (Xcode 16.1)
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Build 16B40
+    • CocoaPods version 1.15.2
+
+[✓] Chrome - develop for the web
+    • Chrome at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+
+[✓] Android Studio (version 2024.2)
+    • Android Studio at /Applications/Android Studio.app/Contents
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 21.0.3+-79915917-b509.11)
+
+[✓] VS Code (version 1.92.2)
+    • VS Code at /Users/weagile/Downloads/Visual Studio Code.app/Contents
+    • Flutter extension version 3.100.0
+
+[✓] VS Code (version 1.94.0)
+    • VS Code at /Users/weagile/Downloads/Visual Studio Code 2.app/Contents
+    • Flutter extension version 3.100.0
+
+[✓] Connected device (5 available)
+    • iPhone (mobile)                 • 00008120-0002685A0212201E            • ios            • iOS 18.0.1 22A3370
+    • iPhone 16 Pro (mobile)          • 53E1E88F-77BE-4CFE-8222-72BC034358AC • ios            • com.apple.CoreSimulator.SimRuntime.iOS-18-0 (simulator)
+    • macOS (desktop)                 • macos                                • darwin-arm64   • macOS 15.0.1 24A348 darwin-arm64
+    • Mac Designed for iPad (desktop) • mac-designed-for-ipad                • darwin         • macOS 15.0.1 24A348 darwin-arm64
+    • Chrome (web)                    • chrome                               • web-javascript • Google Chrome 130.0.6723.119
+    ! Error: Browsing on the local area network for Tanishq’s iPhone. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+[✓] Network resources
+    • All expected network resources are available.
+
+• No issues found!
+```
