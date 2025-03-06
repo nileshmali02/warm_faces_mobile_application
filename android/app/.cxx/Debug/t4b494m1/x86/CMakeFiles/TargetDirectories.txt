@@ -1,0 +1,2 @@
+D:/flutter_projects/warm_faces_mobile_application/android/app/.cxx/Debug/t4b494m1/x86/CMakeFiles/edit_cache.dir
+D:/flutter_projects/warm_faces_mobile_application/android/app/.cxx/Debug/t4b494m1/x86/CMakeFiles/rebuild_cache.dir
