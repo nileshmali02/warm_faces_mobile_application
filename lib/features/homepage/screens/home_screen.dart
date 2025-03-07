@@ -9,6 +9,7 @@ import 'package:warm_faces/features/comman/bottom_navbar.dart';
 import 'package:warm_faces/features/comman/welcome_screen.dart';
 import 'package:warm_faces/features/homepage/models/display_daily_clip_model.dart';
 import 'package:warm_faces/features/homepage/repositories/display_daily_clip_repository.dart';
+import 'package:warm_faces/features/homepage/repositories/timer.dart';
 import 'package:warm_faces/utils/constant/colors.dart';
 import 'package:warm_faces/utils/constant/sized.dart';
 
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isBuffering = false; // Track buffering state
   int retryCount = 0; // Counter for retry attempts
   Timer? _videoTimer; // Timer to stop video after 12 seconds
+  // final TimerRepository _timerRepository = TimerRepository(); //Timer repository to manipulate Time
   double selectedRating = 0.0; // Track the selected rating
   bool showRatingValidation = false; //show alert msg when rating not selected
 
@@ -48,12 +50,74 @@ class _HomeScreenState extends State<HomeScreen> {
     'Inappropriate Content',
     'Low Quality'
   ];
+
+  Stopwatch _stopwatch = Stopwatch();
+  Duration _elapsed = Duration.zero;
+
+  void _startTimer() {
+    if (!_stopwatch.isRunning) {
+      _stopwatch.start();
+      _videoTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        setState(() {
+          _elapsed = _stopwatch.elapsed;
+        });
+        debugPrint("Elapsed Time: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+        if(_elapsed.inSeconds == 10){
+          _videoTimer?.cancel();
+          _controller.pause();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavbar()),
+          );
+        }
+      });
+    }
+  }
+
+  void _pauseTimer() {
+    debugPrint("Elapsed Time Paused: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+
+    _stopwatch.stop();
+    debugPrint("Elapsed Time Paused: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+
+    _videoTimer?.cancel();
+  }
+
+  void _resumeTimer() {
+    if (!_stopwatch.isRunning) {
+      _stopwatch.start();
+      _videoTimer = Timer.periodic( Duration(seconds:10- (_elapsed.inSeconds%60) ), (timer) {
+        setState(() {
+          _elapsed = _stopwatch.elapsed;
+        });
+        print("Elapsed Time: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+
+      });
+    }
+  }
+
+  void _resetTimer() {
+    _stopwatch.reset();
+    _elapsed = Duration.zero;
+    _videoTimer?.cancel();
+    setState(() {});
+  }
   @override
   void initState() {
+    for(int i = 31; i < 30; i++) {
+      // Future.delayed(Duration(seconds: 1), () {
+        print("Elapsed Time Live ${_elapsed.inSeconds}");
+
+      // });
+      // Timer.periodic(const Duration(minutes: 2),  (timer) {
+      // });
+    }
+
     super.initState();
     _controller = VideoPlayerController.asset(videoUrl);
     _loadCachedVideoUrl(); // Check if we have a cached video URL
     _fetchVideoDetails(); // Fetch video data asynchronously
+
   }
 
   // Try to load the video URL from local cache first
@@ -148,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
         afterRatingStatus = ratingStatus['afterRating'] == true;
         // // Store the rating status in variables
         // beforeRatingStatus = false;
-        // // beforeRatingStatus = true;
+        // beforeRatingStatus = false;
         // afterRatingStatus = false;
       });
 
@@ -182,21 +246,33 @@ class _HomeScreenState extends State<HomeScreen> {
     if (videoUrl.isNotEmpty) {
       // _controller = VideoPlayerController.network(videoUrl)
       _controller = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
-        ..initialize().then((_) {
+        ..initialize().then((_) async {
           setState(() {});
           _controller.setLooping(true); // Enable looping
           _controller.play(); // Start playing automatically
           // _isPlaying = true; // Video is playing
-
+            if(_controller.value.isPlaying){
+              _startTimer();
+            }
           // code for stop video after 10 sce and navigate to home screen
           if (beforeRatingStatus == true && afterRatingStatus == true) {
-            _videoTimer = Timer(const Duration(seconds: 10), () {
-              _controller.pause();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const BottomNavbar()),
-              ); // New action
-            });
+            // _startTimer(); // New action
+            // _startTimer();
+
+            // if(_elapsed.inSeconds == 10){
+            //   _controller.pause();
+            //     Navigator.pushReplacement(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => const BottomNavbar()),
+            //     );
+            // }
+            // _videoTimer = Timer(const Duration(seconds: 10), () {
+            //   _controller.pause();
+            //   Navigator.pushReplacement(
+            //     context,
+            //     MaterialPageRoute(builder: (context) => const BottomNavbar()),
+            //   ); // New action
+            // });
           }
         })
         ..addListener(() {
@@ -225,10 +301,12 @@ class _HomeScreenState extends State<HomeScreen> {
       if (afterRatingStatus == false) {
         // If after rating is not submitted, show the after rating popup after 10 seconds
 
-        _videoTimer?.cancel();
+        // _videoTimer?.cancel();
+        _pauseTimer() ;
         _showRatingAfterPopup();
         // _videoTimer = Timer(const Duration(seconds: 10), _showRatingAfterPopup);
       } else {
+
         // If after rating is already submitted, pause the video
         _controller.pause();
       }
@@ -245,7 +323,11 @@ class _HomeScreenState extends State<HomeScreen> {
       // // Increment the view count when the user presses play
       // _displayDailyClipRepository.incrementViewCount(videoID);
       // Restart the timer to stop the video after 10 seconds
-      _videoTimer?.cancel();
+
+      // _videoTimer?.cancel(); // Activate in case failure
+      _resumeTimer();
+
+      // _timerRepository.dispose();
       // _videoTimer = Timer(const Duration(seconds: 10), _stopVideoAfterTimeout);
     }
   }
@@ -258,7 +340,8 @@ class _HomeScreenState extends State<HomeScreen> {
         _isPlaying = false;
       });
 
-      _videoTimer?.cancel(); // Cancel the timer when video is paused
+      // _videoTimer?.cancel(); // Cancel the timer when video is paused
+      _resumeTimer();
     }
   }
 
@@ -290,6 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _controller.removeListener(() {});
     _controller.dispose();
     _videoTimer?.cancel(); // Cancel the timer on dispose
+    // _timerRepository.dispose();
     super.dispose();
   }
 
@@ -689,9 +773,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     _isPlaying = true; // Video is playing
                                     //showRatingValidation = false;
                                   });
-                                  _videoTimer = Timer(
-                                      const Duration(seconds: 10),
-                                      _stopVideoAfterTimeout);
+                                  _startTimer();
+                                  // _videoTimer = Timer(
+                                  //     const Duration(seconds: 10),
+                                  //     _stopVideoAfterTimeout);
+
+                                  // _timerRepository.startTimer();
                                 },
                                 child: const Text(
                                   'Submit',
@@ -960,7 +1047,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _showReportPopup() async {
-    showModalBottomSheet(
+    // _timerRepository.pauseTimer();
+    _pauseTimer();
+    _pauseVideo();
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       // isDismissible: false,
@@ -1082,6 +1172,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+    // _timerRepository.resumeTimer();
   }
 
   // Function to submit the report
@@ -1134,5 +1225,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SnackBar(content: Text('Error submitting report: $e')),
       );
     }
+    _resumeTimer();
+
   }
 }
