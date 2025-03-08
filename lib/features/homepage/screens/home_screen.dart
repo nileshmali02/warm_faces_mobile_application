@@ -57,12 +57,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _startTimer() {
     if (!_stopwatch.isRunning) {
       _stopwatch.start();
-      _videoTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _videoTimer = Timer.periodic(const Duration(seconds: 50), (timer) {
         setState(() {
           _elapsed = _stopwatch.elapsed;
         });
-        debugPrint("Elapsed Time: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
-        if(_elapsed.inSeconds == 10){
+        debugPrint("Elapsed Time : ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+        if((_elapsed.inSeconds) > 10){
+          debugPrint("Elapsed time is greater than 10 seconds!");
+
           _videoTimer?.cancel();
           _controller.pause();
           Navigator.pushReplacement(
@@ -78,6 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
     debugPrint("Elapsed Time Paused: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
 
     _stopwatch.stop();
+    // setState(() {
+    //   _elapsed = _stopwatch.elapsed;
+    // });
     debugPrint("Elapsed Time Paused: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
 
     _videoTimer?.cancel();
@@ -91,28 +96,28 @@ class _HomeScreenState extends State<HomeScreen> {
           _elapsed = _stopwatch.elapsed;
         });
         print("Elapsed Time: ${_elapsed.inMinutes}:${(_elapsed.inSeconds % 60).toString().padLeft(2, '0')}");
+        if((_elapsed.inSeconds) > 10){
+          debugPrint("Elapsed time is greater than 10 seconds!");
 
+          _videoTimer?.cancel();
+          _controller.pause();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavbar()),
+          );
+        }
       });
     }
   }
 
-  void _resetTimer() {
-    _stopwatch.reset();
-    _elapsed = Duration.zero;
-    _videoTimer?.cancel();
-    setState(() {});
-  }
+  // void _resetTimer() {
+  //   _stopwatch.reset();
+  //   _elapsed = Duration.zero;
+  //   _videoTimer?.cancel();
+  //   setState(() {});
+  // }
   @override
   void initState() {
-    for(int i = 31; i < 30; i++) {
-      // Future.delayed(Duration(seconds: 1), () {
-        print("Elapsed Time Live ${_elapsed.inSeconds}");
-
-      // });
-      // Timer.periodic(const Duration(minutes: 2),  (timer) {
-      // });
-    }
-
     super.initState();
     _controller = VideoPlayerController.asset(videoUrl);
     _loadCachedVideoUrl(); // Check if we have a cached video URL
@@ -341,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       // _videoTimer?.cancel(); // Cancel the timer when video is paused
-      _resumeTimer();
+      _pauseTimer();
     }
   }
 
