@@ -181,6 +181,7 @@ class _InstructionScreenState extends State<InstructionScreen> {
                             setState(() {
                               _isChecked = value ?? false;
                             });
+                            _onSkip(); // Navigate to SigninScreen
                           },
                         ),
                         const Text("Don't show this again"),

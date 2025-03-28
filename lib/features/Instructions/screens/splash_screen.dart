@@ -34,24 +34,25 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
 
     // Check if this is the user's first launch
-    bool isFirstLaunch = await _checkFirstLaunch();
+    bool dontShowAgain = await _dontShowAgain();
 
     // Navigate to InstructionScreen or SigninScreen based on the first launch
     Navigator.pushReplacement(context, CupertinoPageRoute(
       builder: (context) {
-        return isFirstLaunch ? const InstructionScreen() : const SigninScreen();
+        // return dontShowAgain ? const InstructionScreen() : const SigninScreen();
+        return dontShowAgain ? const SigninScreen() : const InstructionScreen();
       },
     ));
   }
 
   // Check if it's the user's first launch and update preferences
-  static Future<bool> _checkFirstLaunch() async {
+  static Future<bool> _dontShowAgain() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? isFirstLaunch = prefs.getBool('isFirstLaunch');
+    bool? dontShowAgain = prefs.getBool('dontShowAgain');
 
-    if (isFirstLaunch == null) {
+    if (dontShowAgain == null) {
       // First launch: set the flag and return true to show onboarding
-      prefs.setBool('isFirstLaunch', false);
+      prefs.setBool('dontShowAgain', false);
       return true;
     }
     // Not the first launch: return false to skip onboarding
