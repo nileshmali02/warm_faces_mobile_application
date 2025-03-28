@@ -121,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _controller = VideoPlayerController.asset(videoUrl);
     _loadCachedVideoUrl(); // Check if we have a cached video URL
+
     _fetchVideoDetails(); // Fetch video data asynchronously
 
   }
@@ -130,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     String cachedUrl = prefs.getString('videoUrl') ?? '';
     if (cachedUrl.isNotEmpty) {
+      print("Cached Url => $cachedUrl");
       setState(() {
         videoUrl = cachedUrl;
         isLoading = false; // Video already cached, so not loading
@@ -1182,6 +1184,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Function to submit the report
   Future<void> _submitReport() async {
+    //Clear cached url for reported video
+    final prefs = await SharedPreferences.getInstance();
+    String cachedUrl = prefs.getString('videoUrl') ?? '';
+    if (cachedUrl.isNotEmpty) {
+      setState(() {
+      prefs.remove('videoUrl');
+      });
+    }
     // Check if the user has selected at least one reason or provided a description
     if (selectedReasons.isEmpty && otherController.text.isEmpty) {
       // Show an error message if neither reason nor description is provided

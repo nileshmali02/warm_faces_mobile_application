@@ -121,7 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _controller = VideoPlayerController.asset(videoUrl);
     _loadCachedVideoUrl(); // Check if we have a cached video URL
-    _fetchVideoDetails(); // Fetch video data asynchronously
+
+    // _fetchVideoDetails(); // Fetch video data asynchronously
 
   }
 
@@ -130,11 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     String cachedUrl = prefs.getString('videoUrl') ?? '';
     if (cachedUrl.isNotEmpty) {
+      print("Cached Url => $cachedUrl");
       setState(() {
         videoUrl = cachedUrl;
         isLoading = false; // Video already cached, so not loading
       });
       _initializeVideoPlayer();
+    }else{
+      _fetchVideoDetails(); //Fetch data only when its not cached
     }
   }
 
